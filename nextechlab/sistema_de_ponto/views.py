@@ -9,7 +9,7 @@ from .forms import UserForm, LoginForm
 
 
 def index(request: HttpRequest) -> HttpResponse:
-    return HttpResponse("Hello, world. You're at the sistema_de_ponto index.")
+    return render(request, "sistema_de_ponto/index.html")
 
 
 def user_register(request: HttpRequest) -> HttpResponse:

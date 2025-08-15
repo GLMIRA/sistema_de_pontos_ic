@@ -1,0 +1,24 @@
+{% extends 'nextechlab/templates/base.html' %}
+
+{% block navbar_menu %}
+<!-- Menu específico do sistema -->
+<ul class="navbar-nav me-auto">
+    <li class="nav-item"><a class="nav-link" href="/sistema_de_ponto/">Dashboard</a></li>
+    <li class="nav-item"><a class="nav-link" href="/sistema_de_ponto/historico/">Histórico</a></li>
+</ul>
+
+<div class="d-flex align-items-center gap-2">
+    <!-- Menu do usuário logado -->
+    {% if user.is_authenticated %}
+    <span class="badge bg-warning text-dark">{{ user.profile.pontos_totais }} pts</span>
+    <a href="/logout/" class="btn btn-outline-danger btn-sm">Sair</a>
+    {% endif %}
+    <!-- O botão de tema já vem automático da base -->
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    {% block sistema_content %}{% endblock %}
+</div>
+{% endblock %}
