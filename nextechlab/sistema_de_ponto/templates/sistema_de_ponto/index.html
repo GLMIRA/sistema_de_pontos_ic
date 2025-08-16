@@ -1,8 +1,120 @@
-{% extends 'base_sistema.html}
+{% extends "sistema_de_ponto/base_sistema.html" %}
+
+{% block title %}Dashboard - Sistema de Ponto{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <h1>Bem-vindo ao NexTech Lab</h1>
-    <!-- conteúdo da página inicial -->
+<div class="container py-4">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center py-5">
+                    <h1 class="display-4 fw-bold">
+                        <i class="bi bi-clock-fill"></i>
+                        Sistema de Ponto
+                    </h1>
+                    <p class="lead mb-4">
+                        Controle sua presença de forma simples e eficiente
+                    </p>
+
+                    {% if user.is_authenticated %}
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'sistema_de_ponto:aluno_dia' %}" class="btn btn-light btn-lg">
+                            <i class="bi bi-speedometer2"></i>
+                            Ir para Registros
+                        </a>
+                    </div>
+                    {% else %}
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'sistema_de_ponto:login' %}" class="btn btn-light btn-lg">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            Fazer Login
+                        </a>
+                        <a href="{% url 'sistema_de_ponto:cadastro' %}" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-person-plus"></i>
+                            Cadastrar-se
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status do Usuário (se logado) -->
+    {% if user.is_authenticated %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-person-circle"></i>
+                        Bem-vindo, {{ user.first_name|default:user.username }}!
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>Usuário:</strong> {{ user.username|upper }}</p>
+                            <p class="mb-2"><strong>Nome:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+                            <p class="mb-0"><strong>Email:</strong> {{ user.email }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <div class="card bg-success text-white">
+                                        <div class="card-body p-2">
+                                            <h6>{{ total_entradas }}</h6>
+                                            <small>Entradas</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="card bg-danger text-white">
+                                        <div class="card-body p-2">
+                                            <h6>{{ total_saidas }}</h6>
+                                            <small>Saídas</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="card bg-info text-white">
+                                        <div class="card-body p-2">
+                                            <h6>{{ total_horas }}h</h6>
+                                            <small>Horas</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Adiciona animação simples aos cards
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(function (card, index) {
+            card.style.animation = `fadeInUp 0.6s ease forwards ${index * 0.1}s`;
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+        });
+    });
+</script>
+
+<style>
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
 {% endblock %}
