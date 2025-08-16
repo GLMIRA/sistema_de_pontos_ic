@@ -1,0 +1,391 @@
+{% extends "sistema_de_ponto/base_sistema.html" %}
+
+{% block title %}Cadastro - Sistema de Ponto{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <!-- Card de Cadastro -->
+            <div class="card shadow">
+                <div class="card-header bg-success text-white text-center">
+                    <h4 class="mb-0">
+                        <i class="bi bi-person-plus"></i>
+                        Criar Nova Conta
+                    </h4>
+                </div>
+
+                <div class="card-body p-4">
+                    <form method="post" id="cadastroForm">
+                        {% csrf_token %}
+
+                        <!-- Tipo de Usuário -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-person-badge"></i>
+                                Tipo de Usuário
+                            </label>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-check form-check-card">
+                                        <input class="form-check-input" type="radio" name="tipo_usuario" id="tipo_aluno"
+                                            value="aluno" checked>
+                                        <label class="form-check-label w-100" for="tipo_aluno">
+                                            <div class="card h-100">
+                                                <div class="card-body text-center">
+                                                    <i class="bi bi-mortarboard text-primary fs-1"></i>
+                                                    <h6 class="mt-2">Aluno</h6>
+                                                    <small class="text-muted">Acesso imediato</small>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-check form-check-card">
+                                        <input class="form-check-input" type="radio" name="tipo_usuario"
+                                            id="tipo_professor" value="professor">
+                                        <label class="form-check-label w-100" for="tipo_professor">
+                                            <div class="card h-100">
+                                                <div class="card-body text-center">
+                                                    <i class="bi bi-person-workspace text-warning fs-1"></i>
+                                                    <h6 class="mt-2">Professor</h6>
+                                                    <small class="text-muted">Necessita aprovação</small>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Username/RA -->
+                        <div class="mb-3">
+                            <label for="{{ form.username.id_for_label }}" class="form-label">
+                                <i class="bi bi-person"></i>
+                                <span id="usernameLabel">RA (Registro Acadêmico)</span>
+                            </label>
+                            {{ form.username }}
+                            <div class="form-text">
+                                <div id="alunoHelp" class="text-primary">
+                                    <i class="bi bi-info-circle"></i>
+                                    Digite seu RA no formato: <strong>a12345678</strong> (letra "a" seguida de 8
+                                    dígitos)
+                                </div>
+                                <div id="professorHelp" class="text-warning" style="display: none;">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    Digite um nome de usuário (não pode ser formato de RA)
+                                </div>
+                            </div>
+                            {% if form.username.errors %}
+                            <div class="text-danger mt-1">
+                                <i class="bi bi-exclamation-circle"></i>
+                                {{ form.username.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Nome e Sobrenome -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                                    <i class="bi bi-person"></i>
+                                    Nome
+                                </label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}
+                                <div class="text-danger mt-1">
+                                    <i class="bi bi-exclamation-circle"></i>
+                                    {{ form.first_name.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                                    <i class="bi bi-person"></i>
+                                    Sobrenome
+                                </label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}
+                                <div class="text-danger mt-1">
+                                    <i class="bi bi-exclamation-circle"></i>
+                                    {{ form.last_name.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">
+                                <i class="bi bi-envelope"></i>
+                                Email
+                            </label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                            <div class="text-danger mt-1">
+                                <i class="bi bi-exclamation-circle"></i>
+                                {{ form.email.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Senhas -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.password1.id_for_label }}" class="form-label">
+                                    <i class="bi bi-lock"></i>
+                                    Senha
+                                </label>
+                                {{ form.password1 }}
+                                {% if form.password1.errors %}
+                                <div class="text-danger mt-1">
+                                    <i class="bi bi-exclamation-circle"></i>
+                                    {{ form.password1.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label for="{{ form.password2.id_for_label }}" class="form-label">
+                                    <i class="bi bi-lock-fill"></i>
+                                    Confirmar Senha
+                                </label>
+                                {{ form.password2 }}
+                                {% if form.password2.errors %}
+                                <div class="text-danger mt-1">
+                                    <i class="bi bi-exclamation-circle"></i>
+                                    {{ form.password2.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-person-plus"></i>
+                                Criar Conta
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Footer do Card -->
+                <div class="card-footer text-center">
+                    <p class="mb-0">
+                        Já tem uma conta?
+                        <a href="/sistema_de_ponto/login/" class="text-decoration-none fw-bold">
+                            Faça login aqui
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Card de Instruções -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="bi bi-lightbulb text-primary"></i>
+                        Instruções de Cadastro
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="bg-primary bg-opacity-10 p-3 rounded">
+                                <h6 class="text-primary">
+                                    <i class="bi bi-mortarboard"></i>
+                                    Para Alunos
+                                </h6>
+                                <ul class="list-unstyled mb-0 small">
+                                    <li><i class="bi bi-check text-success"></i> Use seu RA como username</li>
+                                    <li><i class="bi bi-check text-success"></i> Formato obrigatório: a12345678</li>
+                                    <li><i class="bi bi-check text-success"></i> Acesso liberado imediatamente</li>
+                                    <li><i class="bi bi-check text-success"></i> Pode registrar ponto após login</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="bg-warning bg-opacity-10 p-3 rounded">
+                                <h6 class="text-warning">
+                                    <i class="bi bi-person-workspace"></i>
+                                    Para Professores
+                                </h6>
+                                <ul class="list-unstyled mb-0 small">
+                                    <li><i class="bi bi-exclamation-triangle text-warning"></i> Username personalizado
+                                    </li>
+                                    <li><i class="bi bi-exclamation-triangle text-warning"></i> Não pode ser formato de
+                                        RA</li>
+                                    <li><i class="bi bi-clock text-info"></i> Aguardar aprovação do admin</li>
+                                    <li><i class="bi bi-envelope text-info"></i> Contatar administrador se necessário
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tipoAluno = document.getElementById('tipo_aluno');
+        const tipoProfessor = document.getElementById('tipo_professor');
+        const usernameLabel = document.getElementById('usernameLabel');
+        const alunoHelp = document.getElementById('alunoHelp');
+        const professorHelp = document.getElementById('professorHelp');
+        const usernameField = document.getElementById('{{ form.username.id_for_label }}');
+
+        function updateInterface() {
+            if (tipoAluno.checked) {
+                usernameLabel.textContent = 'RA (Registro Acadêmico)';
+                alunoHelp.style.display = 'block';
+                professorHelp.style.display = 'none';
+                usernameField.placeholder = 'Ex: a12345678';
+                usernameField.setAttribute('pattern', '^a\\d{8}$');
+            } else {
+                usernameLabel.textContent = 'Nome de Usuário';
+                alunoHelp.style.display = 'none';
+                professorHelp.style.display = 'block';
+                usernameField.placeholder = 'Ex: joao.silva';
+                usernameField.removeAttribute('pattern');
+            }
+        }
+
+        // Event listeners para mudança de tipo
+        tipoAluno.addEventListener('change', updateInterface);
+        tipoProfessor.addEventListener('change', updateInterface);
+
+        // Validação em tempo real
+        usernameField.addEventListener('input', function () {
+            const value = this.value.toLowerCase().trim();
+
+            if (tipoAluno.checked) {
+                // Para alunos: deve ser formato RA
+                if (value && !value.match(/^a\d{0,8}$/)) {
+                    this.setCustomValidity('RA deve seguir o formato a12345678');
+                } else if (value && value.length === 9 && !value.match(/^a\d{8}$/)) {
+                    this.setCustomValidity('RA deve ter exatamente 8 dígitos após o "a"');
+                } else {
+                    this.setCustomValidity('');
+                }
+            } else {
+                // Para professores: não pode ser formato RA
+                if (value.match(/^a\d+$/)) {
+                    this.setCustomValidity('Professores não podem usar formato de RA');
+                } else {
+                    this.setCustomValidity('');
+                }
+            }
+        });
+
+        // Validação no submit
+        document.getElementById('cadastroForm').addEventListener('submit', function (e) {
+            const username = usernameField.value.trim().toLowerCase();
+
+            if (tipoAluno.checked) {
+                if (!username.match(/^a\d{8}$/)) {
+                    alert('Para alunos, o RA deve ter o formato: a12345678\n(letra "a" seguida de exatamente 8 dígitos)');
+                    e.preventDefault();
+                    usernameField.focus();
+                    return false;
+                }
+            } else {
+                if (username.match(/^a\d+$/)) {
+                    alert('Professores não podem usar formato de RA como username\nEscolha um nome de usuário diferente.');
+                    e.preventDefault();
+                    usernameField.focus();
+                    return false;
+                }
+            }
+        });
+
+        // Atualiza visual dos cards de tipo de usuário
+        function updateCardSelection() {
+            const alunoCard = document.querySelector('label[for="tipo_aluno"] .card');
+            const professorCard = document.querySelector('label[for="tipo_professor"] .card');
+
+            if (tipoAluno.checked) {
+                alunoCard.classList.add('border-primary', 'bg-primary', 'bg-opacity-10');
+                alunoCard.classList.remove('border-warning', 'bg-warning', 'bg-opacity-10');
+                professorCard.classList.remove('border-warning', 'bg-warning', 'bg-opacity-10');
+            } else {
+                professorCard.classList.add('border-warning', 'bg-warning', 'bg-opacity-10');
+                professorCard.classList.remove('border-primary', 'bg-primary', 'bg-opacity-10');
+                alunoCard.classList.remove('border-primary', 'bg-primary', 'bg-opacity-10');
+            }
+        }
+
+        tipoAluno.addEventListener('change', updateCardSelection);
+        tipoProfessor.addEventListener('change', updateCardSelection);
+
+        // Inicializa a interface
+        updateInterface();
+        updateCardSelection();
+
+        // Animação dos cards
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(function (card, index) {
+            card.style.animation = `fadeInUp 0.6s ease forwards ${index * 0.1}s`;
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+        });
+    });
+</script>
+
+<style>
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .form-check-card .form-check-input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .form-check-card .card {
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid #dee2e6;
+    }
+
+    .form-check-card .card:hover {
+        border-color: #86b7fe;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-check-card input:checked+label .card {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .card {
+        border: none;
+        border-radius: 1rem;
+    }
+
+    .card-header {
+        border-radius: 1rem 1rem 0 0 !important;
+    }
+
+    .card-footer {
+        border-radius: 0 0 1rem 1rem !important;
+    }
+
+    .form-control:focus {
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        border-color: #86b7fe;
+    }
+
+    .bg-opacity-10 {
+        --bs-bg-opacity: 0.1;
+    }
+</style>
+{% endblock %}
