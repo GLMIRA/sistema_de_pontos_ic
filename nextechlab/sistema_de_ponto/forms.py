@@ -1,55 +1,82 @@
+import re
+
 from django import forms
-from .models import Aluno, Professor
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import AuthenticationForm
+
+from .models import RegistroPonto
 
 
-class LoginForm(AuthenticationForm):
-    username = forms.CharField(
-        max_length=150,
-        widget=forms.TextInput(
-            attrs={
-                "placeholder": "Username",
-                "class": "form-control",
-            }
-        ),
+class CadastroForm(UserCreationForm):
+    first_name = forms.CharField(
+        max_length=30,
+        required=True,
+        label="Nome",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
     )
-    password = forms.CharField(
-        widget=forms.PasswordInput(
-            attrs={
-                "placeholder": "Password",
-                "class": "form-control",
-            }
-        ),
+    last_name = forms.CharField(
+        max_length=30,
+        required=True,
+        label="Sobrenome",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+    email = forms.EmailField(
+        required=True,
+        label="Email",
+        widget=forms.EmailInput(attrs={"class": "form-control"}),
     )
 
-
-class UserForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = [
+        fields = (
             "username",
-            "password",
             "first_name",
             "last_name",
             "email",
-        ]
+            "password1",
+            "password2",
+        )
+        widgets = {
+            "username": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "RA (para alunos): a12345678 ou username (para professores)",
+                }
+            )
+        }
 
+    def __init__(self, *args, **kwargs):
+        """
+        Inicializa o formulário e adiciona classes CSS aos campos de senha
+        """
+        super().__init__(*args, **kwargs)
+        self.fields["password1"].widget.attrs.update({"class": "form-control"})
+        self.fields["password2"].widget.attrs.update({"class": "form-control"})
 
-class AlunoForm(forms.ModelForm):
-    class Meta:
-        model = Aluno
-        fields = [
-            "name",
-            "ra",
-            "email",
-        ]
+    def clean_username(self):
+        """
+        Valida se o username já existe no banco de dados
+        """
+        username = self.cleaned_data.get("username", "").strip().lower()
 
+        if User.objects.filter(username=username).exists():
+            raise forms.ValidationError("Este usuário já existe!")
 
-class ProfessorForm(forms.ModelForm):
-    class Meta:
-        model = Professor
-        fields = [
-            "name",
-            "email",
-        ]
+        return username
+
+    def validar_ra_para_aluno(self) -> bool:
+        """
+        Verifica se o username segue o padrão de RA para alunos
+        Padrão: a + 8 dígitos (exemplo: a12345678)
+        """
+        username = self.cleaned_data.get("username", "")
+        return re.match(r"^a\d{8}$", username) is not None
+
+    def validar_username_para_professor(self) -> bool:
+        """
+        Verifica se o username é válido para professores
+        Professores NÃO podem usar o formato de RA (a + dígitos)
+        """
+        username = self.cleaned_data.get("username", "")
+        # Não pode ser formato de RA (a + qualquer quantidade de dígitos)
+        return not re.match(r"^a\d+$", username)
