@@ -69,7 +69,7 @@
                             <div class="form-text">
                                 <div id="alunoHelp" class="text-primary">
                                     <i class="bi bi-info-circle"></i>
-                                    Digite seu RA no formato: <strong>a12345678</strong> (letra "a" seguida de 8
+                                    Digite seu RA no formato: <strong>a1234567</strong> (letra "a" seguida de 7
                                     dígitos)
                                 </div>
                                 <div id="professorHelp" class="text-warning" style="display: none;">
@@ -197,7 +197,7 @@
                                 </h6>
                                 <ul class="list-unstyled mb-0 small">
                                     <li><i class="bi bi-check text-success"></i> Use seu RA como username</li>
-                                    <li><i class="bi bi-check text-success"></i> Formato obrigatório: a12345678</li>
+                                    <li><i class="bi bi-check text-success"></i> Formato obrigatório: a1234567</li>
                                     <li><i class="bi bi-check text-success"></i> Acesso liberado imediatamente</li>
                                     <li><i class="bi bi-check text-success"></i> Pode registrar ponto após login</li>
                                 </ul>
@@ -243,8 +243,8 @@
                 usernameLabel.textContent = 'RA (Registro Acadêmico)';
                 alunoHelp.style.display = 'block';
                 professorHelp.style.display = 'none';
-                usernameField.placeholder = 'Ex: a12345678';
-                usernameField.setAttribute('pattern', '^a\\d{8}$');
+                usernameField.placeholder = 'Ex: a1234567';
+                usernameField.setAttribute('pattern', '^a\\d{7}$');
             } else {
                 usernameLabel.textContent = 'Nome de Usuário';
                 alunoHelp.style.display = 'none';
@@ -263,11 +263,11 @@
             const value = this.value.toLowerCase().trim();
 
             if (tipoAluno.checked) {
-                // Para alunos: deve ser formato RA
-                if (value && !value.match(/^a\d{0,8}$/)) {
-                    this.setCustomValidity('RA deve seguir o formato a12345678');
-                } else if (value && value.length === 9 && !value.match(/^a\d{8}$/)) {
-                    this.setCustomValidity('RA deve ter exatamente 8 dígitos após o "a"');
+                // Para alunos: deve ser formato RA (a + 7 dígitos)
+                if (value && !value.match(/^a\d{0,7}$/)) {
+                    this.setCustomValidity('RA deve seguir o formato a1234567');
+                } else if (value && value.length === 8 && !value.match(/^a\d{7}$/)) {
+                    this.setCustomValidity('RA deve ter exatamente 7 dígitos após o "a"');
                 } else {
                     this.setCustomValidity('');
                 }
@@ -286,8 +286,8 @@
             const username = usernameField.value.trim().toLowerCase();
 
             if (tipoAluno.checked) {
-                if (!username.match(/^a\d{8}$/)) {
-                    alert('Para alunos, o RA deve ter o formato: a12345678\n(letra "a" seguida de exatamente 8 dígitos)');
+                if (!username.match(/^a\d{7}$/)) {
+                    alert('Para alunos, o RA deve ter o formato: a1234567\n(letra "a" seguida de exatamente 7 dígitos)');
                     e.preventDefault();
                     usernameField.focus();
                     return false;

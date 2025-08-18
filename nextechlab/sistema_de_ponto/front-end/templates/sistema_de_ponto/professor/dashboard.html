@@ -1,0 +1,242 @@
+{% extends "sistema_de_ponto/base_sistema.html" %}
+{% load static %}
+{% load extras %}
+
+{% block title %}Dashboard Professor{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard_professor.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">
+                        <i class="bi bi-graph-up"></i>
+                        Dashboard do Professor
+                    </h4>
+                    <p class="mb-0 mt-2">Clique em um aluno para ver seus registros detalhados</p>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="bg-primary bg-opacity-10 p-3 rounded text-center">
+                                <i class="bi bi-people-fill text-primary fs-1"></i>
+                                <h5 class="text-primary mt-2">{{ alunos|length }}</h5>
+                                <small class="text-muted">Alunos Ativos</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="bg-success bg-opacity-10 p-3 rounded text-center">
+                                <i class="bi bi-clock-fill text-success fs-1"></i>
+                                <h5 class="text-success mt-2">Sistema Ativo</h5>
+                                <small class="text-muted">Registrando Pontos</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="bg-info bg-opacity-10 p-3 rounded text-center">
+                                <i class="bi bi-calendar-check-fill text-info fs-1"></i>
+                                <h5 class="text-info mt-2">{{ data_atual|date:"d/m/Y" }}</h5>
+                                <small class="text-muted">Data Atual</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h5 class="mb-3">
+                        <i class="bi bi-mortarboard"></i>
+                        Alunos Cadastrados
+                    </h5>
+
+                    {% if alunos %}
+                    <div class="row">
+                        {% for aluno in alunos %}
+                        {% with dados_por_aluno|get_aluno_data:aluno.id as dados_aluno %}
+
+                        <div class="col-lg-4 col-md-6 mb-3">
+                            <div class="card card-aluno h-100" data-aluno-id="{{ aluno.id }}">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <h6 class="card-title text-primary mb-1">
+                                                <i class="bi bi-person-circle"></i>
+                                                {% if aluno.first_name %}
+                                                {{ aluno.first_name }} {{ aluno.last_name }}
+                                                {% else %}
+                                                {{ aluno.username }}
+                                                {% endif %}
+                                            </h6>
+                                            <small class="text-muted">ID: {{ aluno.id }}</small>
+                                        </div>
+                                        <i class="bi bi-chevron-right text-muted"></i>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div class="bg-success bg-opacity-10 p-2 rounded text-center">
+                                                <i class="bi bi-clock text-success"></i>
+                                                <div class="fw-bold text-success">
+                                                    {% if dados_aluno %}
+                                                    {{ dados_aluno.total_horas|hours_to_hm }}
+                                                    {% else %}
+                                                    0h 0m
+                                                    {% endif %}
+                                                </div>
+                                                <small class="text-muted">Horas</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="bg-info bg-opacity-10 p-2 rounded text-center">
+                                                <i class="bi bi-list-check text-info"></i>
+                                                <div class="fw-bold text-info">
+                                                    {% if dados_aluno %}
+                                                    {{ dados_aluno.total_registros }}
+                                                    {% else %}
+                                                    0
+                                                    {% endif %}
+                                                </div>
+                                                <small class="text-muted">Registros</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-3 text-center">
+                                        <small class="text-primary">
+                                            <i class="bi bi-cursor-fill"></i>
+                                            Clique para detalhes
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endwith %}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="bg-warning bg-opacity-10 p-4 rounded text-center">
+                        <i class="bi bi-exclamation-triangle text-warning fs-1"></i>
+                        <h5 class="text-warning mt-2">Nenhum aluno encontrado</h5>
+                        <p class="text-muted mb-0">Não há alunos com registros de ponto no sistema.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-aluno-selecionado mt-4" style="display: none;">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-person-check"></i>
+                    <span id="nome-aluno-selecionado"></span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="bg-success bg-opacity-10 p-3 rounded text-center">
+                            <i class="bi bi-clock-fill text-success fs-2"></i>
+                            <h5 class="text-success mt-2" id="horas-aluno-selecionado"></h5>
+                            <small class="text-muted">Total de Horas</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="bg-info bg-opacity-10 p-3 rounded text-center">
+                            <i class="bi bi-list-ul text-info fs-2"></i>
+                            <h5 class="text-info mt-2" id="registros-aluno-selecionado"></h5>
+                            <small class="text-muted">Total de Registros</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="bg-secondary bg-opacity-10 p-3 rounded text-center">
+                            <button class="btn btn-secondary" id="btn-limpar-selecao">
+                                <i class="bi bi-x-circle"></i>
+                                Limpar Seleção
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tabela-registros mt-4" style="display: none;">
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-clock-history"></i>
+                    Histórico de Registros - <span id="titulo-aluno"></span>
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th><i class="bi bi-calendar3"></i> Data</th>
+                                <th><i class="bi bi-clock"></i> Horário</th>
+                                <th><i class="bi bi-tag"></i> Tipo</th>
+                                <th><i class="bi bi-info-circle"></i> Data/Hora Completa</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-registros-corpo">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-light text-center">
+                <small class="text-muted">
+                    <i class="bi bi-info-circle"></i>
+                    Registros ordenados do mais recente para o mais antigo
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-body">
+            <h6 class="card-title">
+                <i class="bi bi-lightbulb text-primary"></i>
+                Como usar o Dashboard
+            </h6>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="bg-primary bg-opacity-10 p-3 rounded">
+                        <h6 class="text-primary">
+                            <i class="bi bi-cursor-fill"></i>
+                            Seleção de Aluno
+                        </h6>
+                        <ul class="list-unstyled mb-0 small">
+                            <li><i class="bi bi-check text-success"></i> Clique em qualquer card de aluno</li>
+                            <li><i class="bi bi-check text-success"></i> Visualize informações detalhadas</li>
+                            <li><i class="bi bi-check text-success"></i> Veja histórico completo de registros</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="bg-success bg-opacity-10 p-3 rounded">
+                        <h6 class="text-success">
+                            <i class="bi bi-eye"></i>
+                            Informações Disponíveis
+                        </h6>
+                        <ul class="list-unstyled mb-0 small">
+                            <li><i class="bi bi-clock text-info"></i> Total de horas trabalhadas</li>
+                            <li><i class="bi bi-list text-info"></i> Quantidade de registros</li>
+                            <li><i class="bi bi-calendar text-info"></i> Histórico detalhado por data</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script id="dados-django" type="application/json">{{ dados_por_aluno|to_json|safe }}</script>
+<script src="{% static 'js/dashboard_professor.js' %}"></script>
+{% endblock %}

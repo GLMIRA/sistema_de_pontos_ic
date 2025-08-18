@@ -67,10 +67,10 @@ class CadastroForm(UserCreationForm):
     def validar_ra_para_aluno(self) -> bool:
         """
         Verifica se o username segue o padrão de RA para alunos
-        Padrão: a + 8 dígitos (exemplo: a12345678)
+        Padrão: a + 8 dígitos (exemplo: a1234567)
         """
         username = self.cleaned_data.get("username", "")
-        return re.match(r"^a\d{8}$", username) is not None
+        return re.match(r"^a\d{7}$", username) is not None
 
     def validar_username_para_professor(self) -> bool:
         """
