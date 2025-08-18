@@ -1,0 +1,330 @@
+{% extends "sistema_de_ponto/base_sistema.html" %}
+{% load extras %}
+
+{% block title %}Histórico de Pontos{% endblock %}
+
+{% block content %}
+<main class="hist-main" aria-labelledby="titulo-historico">
+    <div class="container">
+        <h1 id="titulo-historico" class="page-title">Histórico de Pontos</h1>
+
+        {% if datas_ordenadas %}
+        <section class="controls" aria-label="Controles do histórico">
+            <label for="select-dia" class="label">Selecione o dia:</label>
+            <select id="select-dia" class="select">
+                <option value="">-- Selecione um dia --</option>
+                {% for data in datas_ordenadas %}
+                <option value="{{ data|date_to_key }}">{{ data|date:"d/m/Y" }}</option>
+                {% endfor %}
+            </select>
+        </section>
+
+        <!-- Layout flex: painel principal + aside -->
+        <div class="layout">
+            <section id="visao-rapida" class="card main-card" aria-labelledby="titulo-visao">
+                <div class="card-body">
+                    <h2 id="titulo-visao" class="card-title">Total do dia</h2>
+                    <p class="total-valor" id="total-horas">0h 0m</p>
+
+                    <h3 class="lista-titulo">Registros</h3>
+                    <ul id="registros-lista" class="lista"></ul>
+                </div>
+            </section>
+
+            <aside class="card small" aria-labelledby="titulo-total-geral">
+                <div class="card-body">
+                    <h4 id="titulo-total-geral">Total geral</h4>
+                    <p class="total-geral">{{ total_horas_geral|hours_to_hm }}</p>
+                </div>
+            </aside>
+        </div>
+
+        <!-- Dados pré-renderizados escondidos (DOM) -->
+        <div id="dados-por-dia" hidden>
+            {% for data in datas_ordenadas %}
+            <div id="dados-{{ data|date_to_key }}">
+                <span class="total" data-total="{{ total_horas_por_dia|get_item:data }}"
+                    data-total-str="{{ total_horas_por_dia|get_item:data|hours_to_hm }}"></span>
+                <ul class="registros">
+                    {% for r in registros_por_data|get_item:data %}
+                    <li data-tipo="{{ r.tipo }}" data-hora="{{ r.data_hora|time:'H:i:s' }}">
+                        <span class="badge {{ r.tipo|badge_class }}">{{ r.tipo|capfirst }}</span>
+                        <span class="hora">{{ r.data_hora|time:"H:i:s" }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endfor %}
+        </div>
+
+        <style>
+            /* Container / tipografia */
+            .container {
+                max-width: 980px;
+                margin: 1.5rem auto;
+                padding: 0 1rem;
+            }
+
+            .page-title {
+                text-align: center;
+                margin-bottom: 1rem;
+                font-size: 1.5rem;
+            }
+
+            /* Controls */
+            .controls {
+                display: flex;
+                gap: 1rem;
+                justify-content: center;
+                align-items: center;
+                margin-bottom: 1rem;
+            }
+
+            .label {
+                font-weight: 600;
+                margin-right: .5rem;
+            }
+
+            .select {
+                padding: .4rem .6rem;
+                border-radius: .4rem;
+                border: 1px solid #ccc;
+                min-width: 220px;
+            }
+
+            /* Layout flex para evitar float (melhor que float) */
+            .layout {
+                display: flex;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .main-card {
+                flex: 1 1 0;
+            }
+
+            .card.small {
+                flex: 0 0 180px;
+                width: 180px;
+            }
+
+            /* Card básico */
+            .card {
+                background: #fff;
+                border-radius: .5rem;
+                box-shadow: 0 6px 18px rgba(0, 0, 0, .06);
+                padding: 0;
+                margin-bottom: 1rem;
+                overflow: hidden;
+            }
+
+            .card-body {
+                padding: 1rem;
+                text-align: center;
+            }
+
+            /* centraliza conteúdo do card (resolve total não centralizado) */
+            .card-title {
+                margin: 0;
+                font-size: 1.05rem;
+            }
+
+            /* Total do dia */
+            .total-valor {
+                font-size: 1.4rem;
+                font-weight: 700;
+                margin: .5rem 0;
+                display: block;
+            }
+
+            /* Lista de registros */
+            .lista,
+            .registros {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .lista li,
+            .registros li {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: .5rem .6rem;
+                border-bottom: 1px solid #eee;
+            }
+
+            .lista-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+            }
+
+            /* Badges */
+            .badge {
+                display: inline-block;
+                padding: .25rem .45rem;
+                border-radius: .35rem;
+                font-size: .85rem;
+                color: #fff;
+                text-transform: capitalize;
+                margin-right: .5rem;
+            }
+
+            .badge-success {
+                background: #198754;
+            }
+
+            .badge-danger {
+                background: #dc3545;
+            }
+
+            .badge-secondary {
+                background: #6c757d;
+            }
+
+            .hora {
+                color: #333;
+                font-weight: 600;
+            }
+
+            .total-geral {
+                font-weight: 700;
+                font-size: 1.25rem;
+                margin-top: .4rem;
+            }
+
+            /* Responsividade */
+            @media (max-width: 880px) {
+                .layout {
+                    flex-direction: column;
+                }
+
+                .card.small {
+                    width: 100%;
+                    flex: none;
+                }
+            }
+
+            /* === Dark mode support ===
+         Suporta html[data-bs-theme="dark"] (usado pelo Bootstrap 5.3+)
+         e fallback para preferência do sistema.
+      */
+            html[data-bs-theme="dark"] .container,
+            html[data-bs-theme="dark"] .card,
+            html[data-bs-theme="dark"] .card.small,
+            html[data-bs-theme="dark"] .main-card {
+                background: #121212;
+                color: #e9ecef;
+                box-shadow: 0 6px 18px rgba(0, 0, 0, .5);
+            }
+
+            html[data-bs-theme="dark"] .card-body {
+                background: transparent;
+            }
+
+            html[data-bs-theme="dark"] .lista li,
+            html[data-bs-theme="dark"] .registros li {
+                border-bottom-color: rgba(255, 255, 255, 0.04);
+            }
+
+            html[data-bs-theme="dark"] .badge-success {
+                background: #2f9e62;
+            }
+
+            html[data-bs-theme="dark"] .badge-danger {
+                background: #e35a55;
+            }
+
+            html[data-bs-theme="dark"] .badge-secondary {
+                background: #495057;
+            }
+
+            /* Fallback para browsers que não usam data-bs-theme, mas suportam preferência do usuário */
+            @media (prefers-color-scheme: dark) {
+
+                :root:not([data-bs-theme]) .container,
+                :root:not([data-bs-theme]) .card {
+                    background: #121212;
+                    color: #e9ecef;
+                }
+            }
+        </style>
+
+        <script>
+            (function () {
+                const selectDia = document.getElementById("select-dia");
+                const totalHorasEl = document.getElementById("total-horas");
+                const registrosLista = document.getElementById("registros-lista");
+
+                function limpar() {
+                    totalHorasEl.textContent = "0h 0m";
+                    registrosLista.innerHTML = "";
+                }
+
+                function renderData(dataKey) {
+                    if (!dataKey) { limpar(); return; }
+                    const dadosDiv = document.getElementById("dados-" + dataKey);
+                    if (!dadosDiv) { limpar(); return; }
+
+                    // total (string formatada já disponível)
+                    const totalSpan = dadosDiv.querySelector(".total");
+                    const totalStr = totalSpan?.dataset?.totalStr ?? (totalSpan?.dataset?.total ? (parseFloat(totalSpan.dataset.total).toFixed(2) + "h") : "0h 0m");
+                    totalHorasEl.textContent = totalStr;
+
+                    // registros
+                    registrosLista.innerHTML = "";
+                    const ul = dadosDiv.querySelector(".registros");
+                    if (!ul) return;
+                    const lis = ul.querySelectorAll("li");
+                    lis.forEach(li => {
+                        const tipo = li.dataset.tipo ?? "";
+                        const hora = li.dataset.hora ?? "";
+                        const item = document.createElement("li");
+                        item.className = "lista-item";
+
+                        // badge
+                        const badge = document.createElement("span");
+                        badge.className = "badge " + (tipo === "entrada" ? "badge-success" : (tipo === "saida" ? "badge-danger" : "badge-secondary"));
+                        badge.textContent = tipo.charAt(0).toUpperCase() + tipo.slice(1);
+
+                        const horaSpan = document.createElement("span");
+                        horaSpan.className = "hora";
+                        horaSpan.textContent = hora;
+
+                        const left = document.createElement("div");
+                        left.appendChild(badge);
+
+                        item.appendChild(left);
+                        item.appendChild(horaSpan);
+                        registrosLista.appendChild(item);
+                    });
+                }
+
+                // evento change
+                selectDia.addEventListener("change", function () {
+                    renderData(this.value);
+                });
+
+                // ao carregar, seleciona o primeiro (mais recente) disponível
+                window.addEventListener("DOMContentLoaded", function () {
+                    const firstOpt = selectDia.querySelector("option[value]:not([value=''])");
+                    if (firstOpt) {
+                        selectDia.value = firstOpt.value;
+                        renderData(firstOpt.value);
+                    }
+                });
+            })();
+        </script>
+
+        {% else %}
+        <div class="card">
+            <div class="card-body">
+                <p>Nenhum registro de ponto encontrado.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}

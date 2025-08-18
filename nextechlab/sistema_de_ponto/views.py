@@ -1,6 +1,7 @@
 import re
 import logging
 
+from django.db.models import F, Sum, ExpressionWrapper, DurationField
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -16,18 +17,14 @@ from datetime import date
 from .forms import CadastroForm
 from .models import RegistroPonto
 
+
 logger = logging.getLogger(__name__)
-
-
-# Test view
-def test(request: HttpRequest) -> HttpResponse:
-    return render(request, "sistema_de_ponto/aluno_ponto.html")
 
 
 def eh_aluno(user: User):
     """
     Verifica se o usuário é um aluno baseado no padrão do RA.
-    RA deve seguir o formato: a + 8 dígitos (ex: a12345678)
+    RA deve seguir o formato: a + 8 dígitos (ex: a1234567)
     """
     return re.match(r"^a\d{7}$", user.username) is not None
 
@@ -39,11 +36,11 @@ def eh_professor(user: User):
     return user.groups.filter(name="Professor").exists()
 
 
-def solicitar_cadastro_professor(request: HttpRequest):
+def view_solicitar_cadastro_professor(request: HttpRequest):
     """
     Página para professores solicitarem aprovação
     """
-    return render(request, "sistema_de_ponto/solicitar_professor.html")
+    return render(request, "sistema_de_ponto/professor/solicitar_professor.html")
 
 
 def index(request: HttpRequest) -> HttpResponse:
@@ -86,6 +83,7 @@ def index(request: HttpRequest) -> HttpResponse:
         "data_atual": agora,
     }
 
+    # Caminho correto para o template
     return render(request, "sistema_de_ponto/index.html", context)
 
 
@@ -94,7 +92,7 @@ class RegisterUserView(CreateView):
     form_class = CadastroForm
     template_name = "sistema_de_ponto/cadastro.html"
     # Usando reverse_lazy para URL correta
-    success_url = reverse_lazy("sistema_de_ponto:aluno_ponto")
+    success_url = reverse_lazy("sistema_de_ponto:index")
 
     def form_valid(self, form):
         """
@@ -108,6 +106,7 @@ class RegisterUserView(CreateView):
             if form.validar_ra_para_aluno():
                 # Corrigido: get_or_create retorna (objeto, created)
                 group_aluno, created = Group.objects.get_or_create(name="Alunos")
+                print("teste_grupo", group_aluno, created)
                 user.groups.add(group_aluno)
 
                 logger.info(f"Novo aluno cadastrado: {user.username}")
@@ -117,7 +116,7 @@ class RegisterUserView(CreateView):
                 login(self.request, user)
 
                 # Redirecionamento correto usando reverse
-                return redirect("sistema_de_ponto:aluno")
+                return redirect("sistema_de_ponto:aluno_dia")
             else:
                 logger.warning(
                     f"Falha no cadastro de aluno: RA inválido - {user.username}"
@@ -136,7 +135,7 @@ class RegisterUserView(CreateView):
                     self.request,
                     "Solicite ao administrador para aprovar seu acesso como professor",
                 )
-                return redirect("sistema_de_ponto:solicitar_cadastro_professor")
+                return redirect("sistema_de_ponto:solicitar_professor")
             else:
                 user.delete()  # Remove o usuário criado com dados inválidos
                 form.add_error(
@@ -170,7 +169,7 @@ class SistemLoginView(LoginView):
         if eh_aluno(user):
             return reverse_lazy("sistema_de_ponto:aluno_dia")
         elif eh_professor(user):
-            return reverse_lazy("sistema_de_ponto:professor_dashboard")
+            return reverse_lazy("sistema_de_ponto:dashbord_professor")
         else:
             messages.info(
                 self.request,
@@ -192,7 +191,7 @@ def logout_view(request: HttpRequest):
 @login_required
 def view_pagina_aluno(request: HttpRequest):
     """
-    Página principal do aluno, onde ele pode registrar ponto
+    Página do aluno, onde ele pode registrar ponto
     """
 
     user = request.user
@@ -257,3 +256,113 @@ def view_registrar_ponto(request: HttpRequest):
         messages.success(request, mensagem)
 
     return redirect("sistema_de_ponto:aluno_dia")
+
+
+@login_required
+def view_historico_de_pontos_completo(request):
+    user = request.user
+
+    if not eh_aluno(user):
+        messages.error(
+            request, "Acesso negado. Apenas alunos podem acessar esta página."
+        )
+        return redirect("sistema_de_ponto:index")
+
+    registros = RegistroPonto.objects.filter(aluno=user).order_by("-data_hora")
+
+    registros_por_data = {}
+    for registro in registros:
+        data = registro.data_hora.date()
+        registros_por_data.setdefault(data, []).append(registro)
+
+    total_horas_por_dia = {}
+    for data, registros_dia in registros_por_data.items():
+        entradas = [r.data_hora for r in registros_dia if r.tipo == "entrada"]
+        saidas = [r.data_hora for r in registros_dia if r.tipo == "saida"]
+
+        total_horas = 0.0
+        for entrada, saida in zip(entradas, saidas):
+            total_horas += (saida - entrada).total_seconds() / 3600.0
+
+        total_horas_por_dia[data] = round(total_horas, 2)
+
+    datas_ordenadas = sorted(registros_por_data.keys(), reverse=True)
+    datas_ordenadas_str = [d.strftime("%Y-%m-%d") for d in datas_ordenadas]
+
+    total_horas_geral = round(sum(total_horas_por_dia.values()), 2)
+
+    contexto = {
+        "registros_por_data": registros_por_data,
+        "total_horas_por_dia": total_horas_por_dia,
+        "datas_ordenadas": datas_ordenadas,
+        "datas_ordenadas_str": datas_ordenadas_str,
+        "total_horas_geral": total_horas_geral,
+        "data_atual": timezone.now(),
+    }
+
+    return render(request, "sistema_de_ponto/aluno/historico_pontos.html", contexto)
+
+
+@login_required
+def view_dashboard_professor(request):
+    """
+    Dashboard para professores, mostrando cards dos alunos.
+    Dados detalhados são carregados via JavaScript quando clicar no aluno.
+    """
+    if not eh_professor(request.user):
+        messages.error(
+            request, "Acesso negado. Apenas professores podem acessar esta página."
+        )
+        return redirect("sistema_de_ponto:index")
+
+    registros = RegistroPonto.objects.select_related("aluno").order_by("-data_hora")
+
+    aluno_ids = registros.values_list("aluno_id", flat=True).distinct()
+    alunos = User.objects.filter(id__in=aluno_ids).order_by(
+        "first_name", "last_name", "username"
+    )
+
+    dados_por_aluno = {}
+
+    for aluno in alunos:
+
+        registros_aluno = registros.filter(aluno=aluno).order_by("-data_hora")
+
+        entradas = [r.data_hora for r in registros_aluno if r.tipo == "entrada"]
+        saidas = [r.data_hora for r in registros_aluno if r.tipo == "saida"]
+        total_horas = 0.0
+
+        for e, s in zip(entradas, saidas):
+            total_horas += (s - e).total_seconds() / 3600.0
+
+        lista_registros = []
+        for registro in registros_aluno:
+            lista_registros.append(
+                {
+                    "data_hora": registro.data_hora.strftime("%d/%m/%Y %H:%M"),
+                    "tipo": registro.tipo,
+                    "data": registro.data_hora.strftime("%d/%m/%Y"),
+                    "hora": registro.data_hora.strftime("%H:%M"),
+                }
+            )
+
+        if aluno.first_name and aluno.last_name:
+            nome_completo = f"{aluno.first_name} {aluno.last_name}"
+        elif aluno.first_name:
+            nome_completo = aluno.first_name
+        else:
+            nome_completo = aluno.username
+
+        dados_por_aluno[str(aluno.id)] = {
+            "nome": nome_completo,
+            "total_horas": round(total_horas, 2),
+            "total_registros": registros_aluno.count(),
+            "registros": lista_registros,
+        }
+    contexto = {
+        "data_atual": timezone.now(),
+        "alunos": alunos,
+        "dados_por_aluno": dados_por_aluno,
+    }
+
+    return render(request, "sistema_de_ponto/professor/dashboard.html", contexto)
