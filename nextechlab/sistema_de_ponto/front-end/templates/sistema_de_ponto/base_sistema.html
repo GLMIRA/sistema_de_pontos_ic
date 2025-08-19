@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load static %}
 
 {% block navbar_menu %}
 <ul class="navbar-nav me-auto">
@@ -26,8 +25,14 @@
 </div>
 
 {% if user.is_authenticated %}
-{% block extra_js %}
-<script src="{% static 'js/sistema/base_sistema.js' %}"></script>
-{% endblock %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const cadastroLink = document.getElementById('cadastro-link');
+        cadastroLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            alert('Você já está cadastrado!');
+        });
+    });
+</script>
 {% endif %}
 {% endblock %}
