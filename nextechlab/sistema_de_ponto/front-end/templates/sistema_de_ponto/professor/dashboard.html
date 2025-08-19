@@ -5,7 +5,7 @@
 {% block title %}Dashboard Professor{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/dashboard_professor.css' %}">
+<link rel="stylesheet" href="{% static 'css/professor/dashboard_professor.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -238,5 +238,5 @@
 
 {% block extra_js %}
 <script id="dados-django" type="application/json">{{ dados_por_aluno|to_json|safe }}</script>
-<script src="{% static 'js/dashboard_professor.js' %}"></script>
+<script src="{% static 'js/professor/dashboard_professor.js' %}"></script>
 {% endblock %}

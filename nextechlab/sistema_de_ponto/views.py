@@ -1,7 +1,7 @@
 import re
 import logging
+from datetime import date
 
-from django.db.models import F, Sum, ExpressionWrapper, DurationField
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -12,7 +12,7 @@ from django.shortcuts import redirect, render
 from django.views.generic import CreateView
 from django.urls import reverse_lazy
 from django.utils import timezone
-from datetime import date
+
 
 from .forms import CadastroForm
 from .models import RegistroPonto
@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 def eh_aluno(user: User):
     """
     Verifica se o usuário é um aluno baseado no padrão do RA.
-    RA deve seguir o formato: a + 8 dígitos (ex: a1234567)
+    RA deve seguir o formato: a + 7 dígitos (ex: a1234567)
     """
     return re.match(r"^a\d{7}$", user.username) is not None
 
@@ -45,46 +45,74 @@ def view_solicitar_cadastro_professor(request: HttpRequest):
 
 def index(request: HttpRequest) -> HttpResponse:
     agora = timezone.now()
-    total_entradas = 0
-    total_saidas = 0
-    total_horas = 0
 
-    # Só calcula se o usuário estiver logado
-    if request.user.is_authenticated:
-        user = request.user
-        hoje = agora.date()
-        registros_hoje = RegistroPonto.objects.filter(
-            aluno=user, data_hora__date=hoje
-        ).order_by("data_hora")
+    if not request.user.is_authenticated:
+        # Usuário não autenticado
+        context = {"data_atual": agora, "user_type": None}
+        return render(request, "sistema_de_ponto/index.html", context)
 
-        total_entradas = registros_hoje.filter(tipo="entrada").count()
-        total_saidas = registros_hoje.filter(tipo="saida").count()
+    # Usuário autenticado - verificar tipo
+    try:
+        if eh_aluno(request.user):
+            user = request.user
+            hoje = agora.date()
+            registros_hoje = RegistroPonto.objects.filter(
+                aluno=user, data_hora__date=hoje
+            ).order_by("data_hora")
 
-        entradas = list(
-            registros_hoje.filter(tipo="entrada").values_list("data_hora", flat=True)
-        )
-        saidas = list(
-            registros_hoje.filter(tipo="saida").values_list("data_hora", flat=True)
-        )
+            total_entradas = registros_hoje.filter(tipo="entrada").count()
+            total_saidas = registros_hoje.filter(tipo="saida").count()
 
-        # Calcula total de horas apenas para pares entrada/saída
-        total_horas = (
-            sum(
-                (saida - entrada).total_seconds()
-                for entrada, saida in zip(entradas, saidas)
+            entradas = list(
+                registros_hoje.filter(tipo="entrada").values_list(
+                    "data_hora", flat=True
+                )
             )
-            / 3600
-        )  # converte para horas
+            saidas = list(
+                registros_hoje.filter(tipo="saida").values_list("data_hora", flat=True)
+            )
 
-    context = {
-        "total_entradas": total_entradas,
-        "total_saidas": total_saidas,
-        "total_horas": round(total_horas, 2),
-        "data_atual": agora,
-    }
+            total_horas = 0
+            if entradas and saidas:
+                total_horas = (
+                    sum(
+                        (saida - entrada).total_seconds()
+                        for entrada, saida in zip(entradas, saidas)
+                    )
+                    / 3600
+                )
 
-    # Caminho correto para o template
-    return render(request, "sistema_de_ponto/index.html", context)
+            context = {
+                "total_entradas": total_entradas,
+                "total_saidas": total_saidas,
+                "total_horas": round(total_horas, 2),
+                "data_atual": agora,
+                "user_type": "aluno",
+            }
+            return render(request, "sistema_de_ponto/index.html", context)
+
+        elif eh_professor(request.user):
+            context = {"data_atual": agora, "user_type": "professor"}
+            return render(request, "sistema_de_ponto/index.html", context)
+
+        else:
+            # Usuário não é nem aluno nem professor
+            context = {
+                "data_atual": agora,
+                "user_type": "unknown",
+                "error_message": "Tipo de usuário não identificado. Entre em contato com o administrador.",
+            }
+            return render(request, "sistema_de_ponto/index.html", context)
+
+    except Exception as e:
+        # Log do erro para debug
+        print(f"Erro na view index: {e}")
+        context = {
+            "data_atual": agora,
+            "user_type": "error",
+            "error_message": "Erro ao carregar dados do usuário.",
+        }
+        return render(request, "sistema_de_ponto/index.html", context)
 
 
 class RegisterUserView(CreateView):

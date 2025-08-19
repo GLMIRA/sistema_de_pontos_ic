@@ -1,6 +1,11 @@
 {% extends "sistema_de_ponto/base_sistema.html" %}
+{% load static %}
 
 {% block title %}Dashboard - Sistema de Ponto{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/sistema/index.css' %}">
+{% endblock %}
 
 {% block content %}
 <div class="container py-4">
@@ -18,12 +23,21 @@
                     </p>
 
                     {% if user.is_authenticated %}
+                    {% if user_type == "aluno" %}
                     <div class="d-flex justify-content-center gap-3">
                         <a href="{% url 'sistema_de_ponto:aluno_dia' %}" class="btn btn-light btn-lg">
                             <i class="bi bi-speedometer2"></i>
                             Ir para Registros
                         </a>
                     </div>
+                    {% elif user_type == "professor" %}
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'sistema_de_ponto:dashbord_professor' %}" class="btn btn-light btn-lg">
+                            <i class="bi bi-speedometer2"></i>
+                            Dashboard Professor
+                        </a>
+                    </div>
+                    {% endif %}
                     {% else %}
                     <div class="d-flex justify-content-center gap-3">
                         <a href="{% url 'sistema_de_ponto:login' %}" class="btn btn-light btn-lg">
@@ -59,6 +73,8 @@
                             <p class="mb-2"><strong>Nome:</strong> {{ user.first_name }} {{ user.last_name }}</p>
                             <p class="mb-0"><strong>Email:</strong> {{ user.email }}</p>
                         </div>
+
+                        {% if user_type == "aluno" %}
                         <div class="col-md-6">
                             <div class="row text-center">
                                 <div class="col-4">
@@ -87,6 +103,19 @@
                                 </div>
                             </div>
                         </div>
+                        {% elif user_type == "professor" %}
+                        <div class="col-md-6">
+                            <div class="text-center">
+                                <div class="card bg-warning text-dark">
+                                    <div class="card-body p-3">
+                                        <h5><i class="bi bi-person-badge"></i></h5>
+                                        <p class="mb-0">Perfil Professor</p>
+                                        <small>Acesse o dashboard para gerenciar turmas</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -97,24 +126,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Adiciona animação simples aos cards
-        const cards = document.querySelectorAll('.card');
-        cards.forEach(function (card, index) {
-            card.style.animation = `fadeInUp 0.6s ease forwards ${index * 0.1}s`;
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-        });
-    });
-</script>
-
-<style>
-    @keyframes fadeInUp {
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-</style>
+<script src="{% static 'js/sistema/index.js' %}"></script>
 {% endblock %}

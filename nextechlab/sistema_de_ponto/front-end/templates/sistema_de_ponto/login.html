@@ -1,6 +1,11 @@
 {% extends "sistema_de_ponto/base_sistema.html" %}
 
+{% load static %}
 {% block title %}Login - Sistema de Ponto{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/sistema/login.css' %}">
+{% endblock %}
 
 {% block content %}
 <div class="container py-5">
@@ -97,77 +102,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const usernameField = document.getElementById('id_username');
-        const form = document.querySelector('form');
-
-        // Focus automático no campo username
-        usernameField.focus();
-
-        // Validação básica em tempo real
-        usernameField.addEventListener('input', function () {
-            const value = this.value.trim().toLowerCase();
-
-            // Se começar com 'a' e tiver números, deve ser RA
-            if (value.match(/^a\d/)) {
-                if (!value.match(/^a\d{7}$/)) {  // <-- RA agora com 7 números
-                    this.setCustomValidity('RA deve ter o formato: a1234567');
-                } else {
-                    this.setCustomValidity('');
-                }
-            } else {
-                this.setCustomValidity('');
-            }
-        });
-
-        // Validação no submit
-        form.addEventListener('submit', function (e) {
-            const username = usernameField.value.trim().toLowerCase();
-
-            // Se começa com 'a', verifica se tem 7 números
-            if (username.startsWith('a') && username.length > 1 && username.length !== 8) {
-                if (!username.match(/^a\d{7}$/)) {
-                    alert('Formato de RA incorreto. Use: a1234567 (letra "a" seguida de 7 dígitos)');
-                    e.preventDefault();
-                    usernameField.focus();
-                    return false;
-                }
-            }
-        });
-
-        // Animação do card
-        const card = document.querySelector('.card');
-        card.style.animation = 'fadeInScale 0.5s ease forwards';
-        card.style.opacity = '0';
-        card.style.transform = 'scale(0.95)';
-    });
-</script>
-
-<style>
-    @keyframes fadeInScale {
-        to {
-            opacity: 1;
-            transform: scale(1);
-        }
-    }
-
-    .form-control:focus {
-        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-        border-color: #86b7fe;
-    }
-
-    .card {
-        border: none;
-        border-radius: 1rem;
-    }
-
-    .card-header {
-        border-radius: 1rem 1rem 0 0 !important;
-    }
-
-    .card-footer {
-        border-radius: 0 0 1rem 1rem !important;
-    }
-</style>
+<script src="{% static 'js/sistema/login.js' %}"></script>
 {% endblock %}
