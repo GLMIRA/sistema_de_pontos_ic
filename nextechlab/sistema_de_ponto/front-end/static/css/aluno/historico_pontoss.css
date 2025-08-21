@@ -1,0 +1,205 @@
+/* Container / tipografia */
+.ajustemain{
+    margin: 2.5rem 0px 0px 0px;
+}
+.containerFicoFeliz{
+    max-width: 980px;
+    margin: 1.5rem auto;
+    padding: 0 1rem;
+    border: 1px #ffffff26 solid;
+    border-radius: 0.375rem;
+}
+
+.page-title {
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    padding: 2rem
+}
+
+/* Controls */
+.controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+
+.label {
+    font-weight: 600;
+    margin-right: .5rem;
+}
+
+.select {
+    padding: .4rem .6rem;
+    border-radius: .4rem;
+    border: 1px solid #ccc;
+    min-width: 220px;
+}
+
+/* Layout flex para evitar float (melhor que float) */
+.layout {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1rem
+}
+
+.main-card {
+    flex: 1 1 0;
+}
+
+.card.small {
+    flex: 0 0 180px;
+    width: 180px;
+    height: 225px;
+}
+
+/* Card básico */
+.card {
+    background: #fff;
+    border-radius: .5rem;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .06);
+    padding: 0;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.card-body {
+    padding: 1rem;
+    text-align: center;
+}
+
+/* centraliza conteúdo do card (resolve total não centralizado) */
+.card-title {
+    margin: 0;
+    font-size: 1.05rem;
+}
+
+/* Total do dia */
+.total-valor {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: .5rem 0;
+    display: block;
+}
+
+/* Lista de registros */
+.lista,
+.registros {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.lista li,
+.registros li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .5rem .6rem;
+    border-bottom: 1px solid #eee;
+}
+
+.lista-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+/* Badges */
+.badge {
+    display: inline-block;
+    padding: .25rem .45rem;
+    border-radius: .35rem;
+    font-size: .85rem;
+    color: #fff;
+    text-transform: capitalize;
+    margin-right: .5rem;
+}
+
+.badge-success {
+    background: #198754;
+}
+
+.badge-danger {
+    background: #dc3545;
+}
+
+.badge-secondary {
+    background: #6c757d;
+}
+
+.hora {
+    font-weight: 600;
+}
+
+.total-geral {
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin-top: .4rem;
+}
+
+/* Responsividade */
+@media (max-width: 880px) {
+    .layout {
+        flex-direction: column;
+    }
+
+    .card.small {
+        width: 100%;
+        flex: none;
+    }
+}
+
+/* === Dark mode support ===
+         Suporta html[data-bs-theme="dark"] (usado pelo Bootstrap 5.3+)
+         e fallback para preferência do sistema.
+      */
+html:not([data-bs-theme="dark"]) .containerFicoFeliz{
+    border: 1px #00000026 solid;
+} 
+html[data-bs-theme="dark"] .containerFicoFeliz,
+html[data-bs-theme="dark"] .card,
+html[data-bs-theme="dark"] .card.small,
+html[data-bs-theme="dark"] .main-card {
+    background: transparent;
+    color: #e9ecef;
+
+}
+
+html[data-bs-theme="dark"] .card-body {
+    background: transparent;
+}
+
+html[data-bs-theme="dark"] .lista li,
+html[data-bs-theme="dark"] .registros li {
+    border-bottom-color: rgba(255, 255, 255, 0.04);
+}
+
+html[data-bs-theme="dark"] .badge-success {
+    background: #2f9e62;
+}
+
+html[data-bs-theme="dark"] .badge-danger {
+    background: #e35a55;
+}
+
+html[data-bs-theme="dark"] .badge-secondary {
+    background: #495057;
+}
+
+/* Fallback para browsers que não usam data-bs-theme, mas suportam preferência do usuário */
+@media (prefers-color-scheme: dark) {
+
+    :root:not([data-bs-theme]) .containerFicoFeliz,
+    :root:not([data-bs-theme]) .card {
+        background: #121212;
+        color: #e9ecef;
+    }
+}
