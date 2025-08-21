@@ -3,11 +3,13 @@ services:
     image: mysql:8.0
     container_name: sistema_de_pontos_db
     restart: unless-stopped
+    env_file:
+      - .env.docker
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root123}
-      MYSQL_DATABASE: ${DB_NAME:-sistema_de_pontos}
-      MYSQL_USER: ${DB_USER:-user}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-password123}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
       - "3306:3306"
     volumes:
@@ -32,7 +34,7 @@ services:
       - static_volume:/app/staticfiles
       - media_volume:/app/media
     env_file:
-      - .env
+      - .env.docker
     environment:
       - PYTHONPATH=/app/nextechlab
       - DJANGO_SETTINGS_MODULE=nextechlab.settings
