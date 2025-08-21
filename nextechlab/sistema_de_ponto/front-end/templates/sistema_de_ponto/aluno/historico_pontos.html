@@ -5,12 +5,13 @@
 {% block title %}Histórico de Pontos{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/aluno/historico_pontos.css' %}">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/aluno/historico_pontoss.css' %}">
 {% endblock %}
 
 {% block content %}
-<main class="hist-main" aria-labelledby="titulo-historico">
-    <div class="container">
+<main class="hist-main ajustemain" aria-labelledby="titulo-historico">
+    <div class="containerFicoFeliz">
         <h1 id="titulo-historico" class="page-title">Histórico de Pontos</h1>
 
         {% if datas_ordenadas %}
@@ -37,7 +38,7 @@
 
             <aside class="card small" aria-labelledby="titulo-total-geral">
                 <div class="card-body">
-                    <h4 id="titulo-total-geral">Total geral</h4>
+                    <h4 id="titulo-total-geral" class="card-title">Total geral</h4>
                     <p class="total-geral">{{ total_horas_geral|hours_to_hm }}</p>
                 </div>
             </aside>
