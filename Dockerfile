@@ -15,7 +15,8 @@ RUN apt-get update && apt-get install -y \
 
 # Definir diretório de trabalho
 WORKDIR /app
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/app/nextechlab
+ENV DJANGO_SETTINGS_MODULE=nextechlab.settings
 
 
 # Copiar requirements e instalar dependências Python
