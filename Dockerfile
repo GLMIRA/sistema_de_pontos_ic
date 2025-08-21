@@ -1,10 +1,14 @@
-FROM python:3.11-slim
+FROM python:3.13-slim
+
+# Variável de ambiente para logs não bufferizados
+ENV PYTHONUNBUFFERED=1
 
 # Instalar dependências do sistema
 RUN apt-get update && apt-get install -y \
     default-libmysqlclient-dev \
     gcc \
     python3-dev \
+    pkg-config \
     curl \
     wget \
     && rm -rf /var/lib/apt/lists/*
