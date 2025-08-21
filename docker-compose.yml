@@ -47,19 +47,15 @@ services:
         echo 'Coletando arquivos estáticos...' &&
         python nextechlab/manage.py collectstatic --noinput &&
         echo 'Criando superusuário se necessário...' &&
-        python nextechlab/manage.py shell -c \"
-        from django.contrib.auth import get_user_model;
-        User = get_user_model();
-        User.objects.filter(username='admin').exists() or User.objects.create_superuser('admin', 'admin@localhost', 'admin123')
-        \" &&
+        python nextechlab/manage.py shell -c \"from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.filter(username='admin').exists() or User.objects.create_superuser('admin', 'admin@localhost', 'admin123')\" &&
         echo 'Iniciando servidor...' &&
-        gunicorn nextechlab.nextechlab.wsgi:application --bind 0.0.0.0:8000 --workers 2 --timeout 120 --max-requests 1000 --preload
+        gunicorn --bind 0.0.0.0:8000 --workers 2 --timeout 120 --max-requests 1000 --preload nextechlab.wsgi:application
       "
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:8000/admin/login/ || exit 1" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/admin/login/" ]
       interval: 30s
       timeout: 10s
-      retries: 5
+      retries: 3
       start_period: 60s
     networks:
       - app-network
@@ -78,7 +74,7 @@ services:
       web:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost/admin/login/ || exit 1" ]
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/admin/login/" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -97,4 +93,3 @@ volumes:
 networks:
   app-network:
     driver: bridge
-    name: sistema_de_pontos_network
