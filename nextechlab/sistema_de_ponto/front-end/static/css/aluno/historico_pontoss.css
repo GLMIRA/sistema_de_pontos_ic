@@ -1,14 +1,20 @@
 /* Container / tipografia */
-.container {
+.ajustemain{
+    margin: 2.5rem 0px 0px 0px;
+}
+.containerFicoFeliz{
     max-width: 980px;
     margin: 1.5rem auto;
     padding: 0 1rem;
+    border: 1px #ffffff26 solid;
+    border-radius: 0.375rem;
 }
 
 .page-title {
     text-align: center;
     margin-bottom: 1rem;
     font-size: 1.5rem;
+    padding: 2rem
 }
 
 /* Controls */
@@ -18,6 +24,9 @@
     justify-content: center;
     align-items: center;
     margin-bottom: 1rem;
+    padding: 1rem;
+    flex-wrap: wrap;
+    flex-direction: column;
 }
 
 .label {
@@ -37,6 +46,7 @@
     display: flex;
     gap: 1rem;
     align-items: flex-start;
+    padding: 1rem
 }
 
 .main-card {
@@ -46,6 +56,7 @@
 .card.small {
     flex: 0 0 180px;
     width: 180px;
+    height: 225px;
 }
 
 /* Card básico */
@@ -125,7 +136,6 @@
 }
 
 .hora {
-    color: #333;
     font-weight: 600;
 }
 
@@ -151,13 +161,16 @@
          Suporta html[data-bs-theme="dark"] (usado pelo Bootstrap 5.3+)
          e fallback para preferência do sistema.
       */
-html[data-bs-theme="dark"] .container,
+html:not([data-bs-theme="dark"]) .containerFicoFeliz{
+    border: 1px #00000026 solid;
+} 
+html[data-bs-theme="dark"] .containerFicoFeliz,
 html[data-bs-theme="dark"] .card,
 html[data-bs-theme="dark"] .card.small,
 html[data-bs-theme="dark"] .main-card {
-    background: #121212;
+    background: transparent;
     color: #e9ecef;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, .5);
+
 }
 
 html[data-bs-theme="dark"] .card-body {
@@ -184,7 +197,7 @@ html[data-bs-theme="dark"] .badge-secondary {
 /* Fallback para browsers que não usam data-bs-theme, mas suportam preferência do usuário */
 @media (prefers-color-scheme: dark) {
 
-    :root:not([data-bs-theme]) .container,
+    :root:not([data-bs-theme]) .containerFicoFeliz,
     :root:not([data-bs-theme]) .card {
         background: #121212;
         color: #e9ecef;
