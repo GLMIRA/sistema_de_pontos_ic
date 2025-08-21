@@ -15,6 +15,8 @@ RUN apt-get update && apt-get install -y \
 
 # Definir diretório de trabalho
 WORKDIR /app
+ENV PYTHONPATH=/app/nextechlab
+
 
 # Copiar requirements e instalar dependências Python
 COPY requirements.txt .
@@ -31,4 +33,5 @@ RUN mkdir -p /app/staticfiles /app/media
 EXPOSE 8000
 
 # Comando padrão (será sobrescrito pelo docker-compose)
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "2", "nextechlab.wsgi:application"]
+CMD ["gunicorn", "nextechlab.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2", "--timeout", "120", "--max-requests", "1000", "--preload"]
+

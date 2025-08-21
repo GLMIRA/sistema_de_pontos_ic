@@ -35,6 +35,9 @@ services:
       - media_volume:/app/media
     env_file:
       - .env
+    environment:
+      - PYTHONPATH=/app/nextechlab
+      - DJANGO_SETTINGS_MODULE=nextechlab.settings
     depends_on:
       db:
         condition: service_healthy
