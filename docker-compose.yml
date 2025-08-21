@@ -36,7 +36,7 @@ services:
     env_file:
       - .env
     environment:
-      - PYTHONPATH=/app/nextechlab
+      - PYTHONPATH=/app
       - DJANGO_SETTINGS_MODULE=nextechlab.settings
     depends_on:
       db:
@@ -52,8 +52,9 @@ services:
         echo 'Criando superusuário se necessário...' &&
         python nextechlab/manage.py shell -c \"from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.filter(username='admin').exists() or User.objects.create_superuser('admin','admin@localhost','admin123')\" &&
         echo 'Iniciando servidor...' &&
-        gunicorn nextechlab.nextechlab.wsgi:application --bind 0.0.0.0:8000 --workers 2 --timeout 120 --max-requests 1000 --preload
+        gunicorn nextechlab.wsgi:application --bind 0.0.0.0:8000 --workers 2 --timeout 120 --max-requests 1000 --preload
       "
+
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:8000/admin/login/ || exit 1" ]
       interval: 30s

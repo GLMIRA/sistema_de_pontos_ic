@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
 
 # Definir diretório de trabalho
 WORKDIR /app
-ENV PYTHONPATH=/app/nextechlab
+ENV PYTHONPATH=/app
 
 
 # Copiar requirements e instalar dependências Python
