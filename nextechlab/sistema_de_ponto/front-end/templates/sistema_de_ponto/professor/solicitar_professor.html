@@ -1,0 +1,11 @@
+{% extends "sistema_de_ponto/base_sistema.html" %}
+
+{% block title %}Solicitar Cadastro{% endblock %}
+
+{% block content %}
+<main class="container" style="max-width:600px; margin:2rem auto; text-align:center;">
+    <h1>Solicitação enviada!</h1>
+    <p>Email: <strong>{{ admi@email.com }}</strong></p>
+    <p><a href="{% url 'sistema_de_ponto:index' %}">← Voltar para a página inicial</a></p>
+</main>
+{% endblock %}

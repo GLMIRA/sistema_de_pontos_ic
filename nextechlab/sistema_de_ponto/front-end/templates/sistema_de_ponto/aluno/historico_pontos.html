@@ -1,0 +1,76 @@
+{% extends "sistema_de_ponto/base_sistema.html" %}
+{% load extras %}
+{% load static %}
+
+{% block title %}Histórico de Pontos{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/aluno/historico_pontos.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="hist-main" aria-labelledby="titulo-historico">
+    <div class="container">
+        <h1 id="titulo-historico" class="page-title">Histórico de Pontos</h1>
+
+        {% if datas_ordenadas %}
+        <section class="controls" aria-label="Controles do histórico">
+            <label for="select-dia" class="label">Selecione o dia:</label>
+            <select id="select-dia" class="select">
+                <option value="">-- Selecione um dia --</option>
+                {% for data in datas_ordenadas %}
+                <option value="{{ data|date_to_key }}">{{ data|date:"d/m/Y" }}</option>
+                {% endfor %}
+            </select>
+        </section>
+
+        <!-- Layout flex: painel principal + aside -->
+        <div class="layout">
+            <section id="visao-rapida" class="card main-card" aria-labelledby="titulo-visao">
+                <div class="card-body">
+                    <h2 id="titulo-visao" class="card-title">Total do dia</h2>
+                    <p class="total-valor" id="total-horas">0h 0m</p>
+                    <h3 class="lista-titulo">Registros</h3>
+                    <ul id="registros-lista" class="lista"></ul>
+                </div>
+            </section>
+
+            <aside class="card small" aria-labelledby="titulo-total-geral">
+                <div class="card-body">
+                    <h4 id="titulo-total-geral">Total geral</h4>
+                    <p class="total-geral">{{ total_horas_geral|hours_to_hm }}</p>
+                </div>
+            </aside>
+        </div>
+
+        <!-- Dados pré-renderizados escondidos (DOM) -->
+        <div id="dados-por-dia" hidden>
+            {% for data in datas_ordenadas %}
+            <div id="dados-{{ data|date_to_key }}">
+                <span class="total" data-total="{{ total_horas_por_dia|get_item:data }}"
+                    data-total-str="{{ total_horas_por_dia|get_item:data|hours_to_hm }}"></span>
+                <ul class="registros">
+                    {% for r in registros_por_data|get_item:data %}
+                    <li data-tipo="{{ r.tipo }}" data-hora="{{ r.data_hora|time:'H:i:s' }}">
+                        <span class="badge {{ r.tipo|badge_class }}">{{ r.tipo|capfirst }}</span>
+                        <span class="hora">{{ r.data_hora|time:"H:i:s" }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="card">
+            <div class="card-body">
+                <p>Nenhum registro de ponto encontrado.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/aluno/historico_pontos.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends "sistema_de_ponto/base_sistema.html" %}
+
+{% load static %}
+{% block title %}Login - Sistema de Ponto{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/sistema/login.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <!-- Card de Login -->
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        Entrar no Sistema
+                    </h4>
+                </div>
+
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Campo Username -->
+                        <div class="mb-3">
+                            <label for="id_username" class="form-label">
+                                <i class="bi bi-person"></i>
+                                Usuário
+                            </label>
+                            <input type="text" class="form-control form-control-lg" id="id_username" name="username"
+                                placeholder="Digite seu RA ou username" required autofocus>
+                            <div class="form-text">
+                                <small class="text-muted">
+                                    <strong>Alunos:</strong> use seu RA (ex: a1234567)<br>
+                                    <strong>Professores:</strong> use seu username
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Campo Password -->
+                        <div class="mb-4">
+                            <label for="id_password" class="form-label">
+                                <i class="bi bi-lock"></i>
+                                Senha
+                            </label>
+                            <input type="password" class="form-control form-control-lg" id="id_password" name="password"
+                                placeholder="Digite sua senha" required>
+                        </div>
+
+                        <!-- Botão de Submit -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-box-arrow-in-right"></i>
+                                Entrar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Footer do Card -->
+                <div class="card-footer text-center">
+                    <p class="mb-0">
+                        Não tem uma conta?
+                        <a href="/sistema_de_ponto/cadastro/" class="text-decoration-none fw-bold">
+                            Cadastre-se aqui
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Card de Informações -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="bi bi-info-circle text-primary"></i>
+                        Informações de Acesso
+                    </h6>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="text-center p-2 bg-success bg-opacity-10 rounded">
+                                <i class="bi bi-mortarboard text-success fs-4"></i>
+                                <h6 class="text-success mt-2">Alunos</h6>
+                                <small>Acesso imediato após cadastro</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center p-2 bg-warning bg-opacity-10 rounded">
+                                <i class="bi bi-person-workspace text-warning fs-4"></i>
+                                <h6 class="text-warning mt-2">Professores</h6>
+                                <small>Necessária aprovação do admin</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/sistema/login.js' %}"></script>
+{% endblock %}

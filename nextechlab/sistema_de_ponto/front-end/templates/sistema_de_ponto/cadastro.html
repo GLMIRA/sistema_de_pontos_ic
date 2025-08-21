@@ -1,0 +1,238 @@
+{% extends "sistema_de_ponto/base_sistema.html" %}
+{% load static %}
+
+{% block title %}Cadastro - Sistema de Ponto{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/sistema/cadastro.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <!-- Card de Cadastro -->
+            <div class="card shadow">
+                <div class="card-header bg-success text-white text-center">
+                    <h4 class="mb-0">
+                        <i class="bi bi-person-plus"></i>
+                        Criar Nova Conta
+                    </h4>
+                </div>
+
+                <div class="card-body p-4">
+                    <form method="post" id="cadastroForm">
+                        {% csrf_token %}
+
+                        <!-- Tipo de Usuário -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-person-badge"></i>
+                                Tipo de Usuário
+                            </label>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-check form-check-card">
+                                        <input class="form-check-input" type="radio" name="tipo_usuario" id="tipo_aluno"
+                                            value="aluno" checked>
+                                        <label class="form-check-label w-100" for="tipo_aluno">
+                                            <div class="card h-100">
+                                                <div class="card-body text-center">
+                                                    <i class="bi bi-mortarboard text-primary fs-1"></i>
+                                                    <h6 class="mt-2">Aluno</h6>
+                                                    <small class="text-muted">Acesso imediato</small>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-check form-check-card">
+                                        <input class="form-check-input" type="radio" name="tipo_usuario"
+                                            id="tipo_professor" value="professor">
+                                        <label class="form-check-label w-100" for="tipo_professor">
+                                            <div class="card h-100">
+                                                <div class="card-body text-center">
+                                                    <i class="bi bi-person-workspace text-warning fs-1"></i>
+                                                    <h6 class="mt-2">Professor</h6>
+                                                    <small class="text-muted">Necessita aprovação</small>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Username/RA -->
+                        <div class="mb-3">
+                            <label for="{{ form.username.id_for_label }}" class="form-label">
+                                <i class="bi bi-person"></i>
+                                <span id="usernameLabel">RA (Registro Acadêmico)</span>
+                            </label>
+                            {{ form.username }}
+                            <div class="form-text">
+                                <div id="alunoHelp" class="text-primary">
+                                    <i class="bi bi-info-circle"></i>
+                                    Digite seu RA no formato: <strong>a1234567</strong> (letra "a" seguida de 7
+                                    dígitos)
+                                </div>
+                                <div id="professorHelp" class="text-warning" style="display: none;">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    Digite um nome de usuário (não pode ser formato de RA)
+                                </div>
+                            </div>
+                            {% if form.username.errors %}
+                            <div class="text-danger mt-1">
+                                <i class="bi bi-exclamation-circle"></i>
+                                {{ form.username.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Nome e Sobrenome -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                                    <i class="bi bi-person"></i>
+                                    Nome
+                                </label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}
+                                <div class="text-danger mt-1">
+                                    <i class="bi bi-exclamation-circle"></i>
+                                    {{ form.first_name.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                                    <i class="bi bi-person"></i>
+                                    Sobrenome
+                                </label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}
+                                <div class="text-danger mt-1">
+                                    <i class="bi bi-exclamation-circle"></i>
+                                    {{ form.last_name.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">
+                                <i class="bi bi-envelope"></i>
+                                Email
+                            </label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                            <div class="text-danger mt-1">
+                                <i class="bi bi-exclamation-circle"></i>
+                                {{ form.email.errors.0 }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Senhas -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.password1.id_for_label }}" class="form-label">
+                                    <i class="bi bi-lock"></i>
+                                    Senha
+                                </label>
+                                {{ form.password1 }}
+                                {% if form.password1.errors %}
+                                <div class="text-danger mt-1">
+                                    <i class="bi bi-exclamation-circle"></i>
+                                    {{ form.password1.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label for="{{ form.password2.id_for_label }}" class="form-label">
+                                    <i class="bi bi-lock-fill"></i>
+                                    Confirmar Senha
+                                </label>
+                                {{ form.password2 }}
+                                {% if form.password2.errors %}
+                                <div class="text-danger mt-1">
+                                    <i class="bi bi-exclamation-circle"></i>
+                                    {{ form.password2.errors.0 }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-person-plus"></i>
+                                Criar Conta
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Footer do Card -->
+                <div class="card-footer text-center">
+                    <p class="mb-0">
+                        Já tem uma conta?
+                        <a href="/sistema_de_ponto/login/" class="text-decoration-none fw-bold">
+                            Faça login aqui
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Card de Instruções -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="bi bi-lightbulb text-primary"></i>
+                        Instruções de Cadastro
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="bg-primary bg-opacity-10 p-3 rounded">
+                                <h6 class="text-primary">
+                                    <i class="bi bi-mortarboard"></i>
+                                    Para Alunos
+                                </h6>
+                                <ul class="list-unstyled mb-0 small">
+                                    <li><i class="bi bi-check text-success"></i> Use seu RA como username</li>
+                                    <li><i class="bi bi-check text-success"></i> Formato obrigatório: a1234567</li>
+                                    <li><i class="bi bi-check text-success"></i> Acesso liberado imediatamente</li>
+                                    <li><i class="bi bi-check text-success"></i> Pode registrar ponto após login</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="bg-warning bg-opacity-10 p-3 rounded">
+                                <h6 class="text-warning">
+                                    <i class="bi bi-person-workspace"></i>
+                                    Para Professores
+                                </h6>
+                                <ul class="list-unstyled mb-0 small">
+                                    <li><i class="bi bi-exclamation-triangle text-warning"></i> Username personalizado
+                                    </li>
+                                    <li><i class="bi bi-exclamation-triangle text-warning"></i> Não pode ser formato de
+                                        RA</li>
+                                    <li><i class="bi bi-clock text-info"></i> Aguardar aprovação do admin</li>
+                                    <li><i class="bi bi-envelope text-info"></i> Contatar administrador se necessário
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/sistema/cadastro.js' %}"></script>
+{% endblock %}
