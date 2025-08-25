@@ -75,6 +75,16 @@ João da Silva – Saída em 21/08/2025 11:37
 
 ## 🚀 Instalação
 
+- crie seu arquivo .env
+```env
+ENVIRONMENT=(coleque aqui dev)
+
+DEBUG=True
+SECRET_KEY="https://docs.djangoproject.com/fr/5.2/ref/settings/#std-setting-SECRET_KEY"
+ALLOWED_HOSTS=192.168.1.*,localhost,127.0.0.1
+
+```
+
 ```bash
 # Clone o repositório
 git clone [URL_DO_REPOSITORIO]
@@ -110,14 +120,7 @@ Tempo: 3h35min
 - ❌ Entrada sem saída = sem cálculo
 - ✅ Múltiplas entradas/saídas = ciclos independentes
 
-## 🤝 Contribuição
-
-1. Fork o projeto
-2. Crie sua branch (`git checkout -b feature/nova-funcionalidade`)
-3. Commit (`git commit -m 'Adiciona nova funcionalidade'`)
-4. Push (`git push origin feature/nova-funcionalidade`)
-5. Abra um Pull Request
-
----
+## 🐳 DOCKER
+- Para o docker clique [aqui](DOCKER.md) ou va em DOCKER.md
 
 **Sistema de Ponto Acadêmico** - Controle de presença para instituições de ensino
