@@ -1,7 +1,9 @@
 # 📚 Sistema de Ponto Acadêmico
 
 ![Django](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=green)
-![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=yellow)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
 Sistema web desenvolvido em **Django** para controle de entrada e saída de alunos dentro da instituição de ensino.
 
@@ -94,7 +96,7 @@ python -m venv venv
 source venv/bin/activate
 
 # Dependências
-pip install -r requiriments.txt
+pip install -r requirements.txt
 
 # Migrações
 python manage.py makemigrations
